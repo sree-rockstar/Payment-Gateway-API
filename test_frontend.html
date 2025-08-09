@@ -8,45 +8,129 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
+            margin: 0;
+            padding: 0;
             background-color: #f5f5f5;
         }
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        .main-container {
+            display: flex;
+            gap: 20px;
+            margin-left: 25px;
+            margin-right: 0;
+            max-width: none;
+        }
+        .left-panel {
+            flex: 2.5;
+            background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1), 0 0 0 1px rgba(255,255,255,0.8);
+            margin-right: 20px;
+            border: 1px solid rgba(255,255,255,0.9);
+            position: relative;
+            overflow: hidden;
+        }
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c);
+            border-radius: 20px 20px 0 0;
+        }
+        .right-panel {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            height: fit-content;
+            position: sticky;
+            top: 0;
+            margin-right: 15px;
+            width: calc(30% - 35px);
+            color: white;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
         }
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
             color: #333;
+            position: relative;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header p {
+            font-size: 1.1em;
+            color: #666;
+            margin-top: 10px;
+            font-weight: 500;
         }
         .section {
-            background: #f8f9fa;
-            padding: 20px;
-            margin: 15px 0;
-            border-radius: 8px;
-            border-left: 4px solid #007bff;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 50%, #ffffff 100%);
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.15);
+            border-left-color: #764ba2;
         }
         .button {
-            background: #007bff;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 12px 24px;
+            padding: 14px 28px;
             border: none;
-            border-radius: 5px;
+            border-radius: 12px;
             cursor: pointer;
             font-size: 16px;
-            margin: 10px 5px;
+            margin: 12px 6px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
         }
         .button:hover {
-            background: #0056b3;
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        .button:hover::before {
+            left: 100%;
         }
         .button:disabled {
-            background: #6c757d;
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
             cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
         }
         .success {
             background: #d4edda;
@@ -70,18 +154,31 @@
         }
         .input-group input {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 14px 16px;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
             font-size: 14px;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.2);
+            background: white;
         }
         .result {
-            background: #e9ecef;
-            padding: 15px;
-            border-radius: 5px;
-            font-family: monospace;
-            margin: 10px 0;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 18px;
+            border-radius: 12px;
+            font-family: 'Courier New', monospace;
+            margin: 12px 0;
             white-space: pre-wrap;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            font-size: 13px;
+            line-height: 1.5;
         }
         .step {
             margin: 20px 0;
@@ -93,151 +190,261 @@
             margin-top: 0;
             color: #007bff;
         }
+        .test-details {
+            font-size: 13px;
+            color: #ffffff;
+        }
+        .test-details h3 {
+            color: #ffffff;
+            font-size: 18px;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            font-weight: bold;
+        }
+        .test-details h4 {
+            margin: 20px 0 12px 0;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            border-bottom: 2px solid rgba(255,255,255,0.5);
+            padding-bottom: 5px;
+        }
+        .test-details table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            font-size: 12px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        .test-details th,
+        .test-details td {
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 6px;
+            text-align: left;
+            color: #ffffff;
+        }
+        .test-details th {
+            background: rgba(0,0,0,0.4);
+            font-weight: bold;
+            color: #ffffff;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+        .test-details tr:nth-child(even) {
+            background: rgba(255,255,255,0.1);
+        }
+        .test-details tr:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .test-details code {
+            background: rgba(0,0,0,0.4);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #ffffff;
+            font-weight: bold;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        .test-details ul,
+        .test-details ol {
+            margin: 12px 0;
+            padding-left: 20px;
+            color: #ffffff;
+        }
+        .test-details li {
+            margin: 6px 0;
+            line-height: 1.4;
+            color: #ffffff;
+        }
+        .test-details p {
+            color: #ffffff;
+            margin: 8px 0;
+        }
+        .test-details strong {
+            color: #ffffff;
+            font-weight: bold;
+        }
+        .test-details .upi-section {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        .test-details .card-section {
+            background: rgba(0,0,0,0.2);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 3px solid #ffffff;
+        }
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            .right-panel {
+                position: static;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>💳 Payment Gateway Test Frontend</h1>
-            <p>Test the complete payment flow with Razorpay integration</p>
-        </div>
-
-        <div class="section">
-            <h3>🔐 Step 1: Authentication</h3>
-            <div class="input-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" value="sree555@gmail.com" placeholder="Enter your email">
-            </div>
-            <div class="input-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" value="password123" placeholder="Enter your password">
-            </div>
-            <button class="button" onclick="login()">🔑 Login & Get Token</button>
-            <div id="loginResult"></div>
-        </div>
-
-        <div class="section">
-            <h3>💰 Step 2: Create Payment</h3>
-            <div class="input-group">
-                <label for="amount">Amount (INR):</label>
-                <input type="number" id="amount" value="1000" min="1" placeholder="Enter amount">
-            </div>
-            <div class="input-group">
-                <label for="description">Description:</label>
-                <input type="text" id="description" value="Payment for services" placeholder="Enter description">
-            </div>
-            <button class="button" onclick="createPayment()" id="createBtn" disabled>📝 Create Payment</button>
-            <div id="createResult"></div>
-        </div>
-
-        <div class="section">
-            <h3>💳 Step 3: Complete Payment</h3>
-            <button class="button" onclick="pay()" id="payBtn" disabled>💳 Pay Now</button>
-            <div id="payResult"></div>
-        </div>
-
-        <div class="section">
-            <h3>✅ Step 4: Verify Payment</h3>
-            <button class="button" onclick="verifyPayment()" id="verifyBtn" disabled>🔍 Verify Payment</button>
-            <div id="verifyResult"></div>
-        </div>
-
-        <div class="section">
-            <h3>📋 Step 5: Check All Payments</h3>
-            <button class="button" onclick="getPayments()">📊 Get My Payments</button>
-            <div id="paymentsResult"></div>
-        </div>
-
-        <div class="section warning">
-            <h3>🧪 Test Payment Details</h3>
-            
-            <h4>💳 Test Cards for Indian Payments</h4>
-            <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
-                <thead>
-                    <tr style="background: #f8f9fa;">
-                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Card Network</th>
-                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Card Number</th>
-                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">CVV</th>
-                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Expiry Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Mastercard</td>
-                        <td style="border: 1px solid #ddd; padding: 8px; font-family: monospace;">2305 3242 5784 8228</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Random CVV</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Any future date</td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Visa</td>
-                        <td style="border: 1px solid #ddd; padding: 8px; font-family: monospace;">4386 2894 0766 0153</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Random CVV</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Any future date</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <h4>🌍 Test Cards for International Payments</h4>
-            <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
-                <thead>
-                    <tr style="background: #f8f9fa;">
-                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Card Network</th>
-                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Card Number</th>
-                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">CVV</th>
-                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Expiry Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Mastercard</td>
-                        <td style="border: 1px solid #ddd; padding: 8px; font-family: monospace;">5421 1393 0609 0628</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Random CVV</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Any future date</td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Mastercard</td>
-                        <td style="border: 1px solid #ddd; padding: 8px; font-family: monospace;">5105 1051 0510 5100</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Random CVV</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Any future date</td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Visa</td>
-                        <td style="border: 1px solid #ddd; padding: 8px; font-family: monospace;">4012 8888 8888 1881</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Random CVV</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Any future date</td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Visa</td>
-                        <td style="border: 1px solid #ddd; padding: 8px; font-family: monospace;">5104 0600 0000 0008</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Random CVV</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Any future date</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <h4>📱 Test UPI Details</h4>
-            <div style="background: #e7f3ff; padding: 15px; border-radius: 5px; margin: 10px 0;">
-                <p><strong>UPI ID for Success Flow:</strong> <code>success@razorpay</code></p>
-                <p><strong>Instructions:</strong></p>
-                <ol>
-                    <li>At the Checkout, select <strong>UPI</strong> as the payment method</li>
-                    <li>Enter the UPI ID: <code>success@razorpay</code></li>
-                    <li>Complete the payment flow</li>
-                </ol>
+    <div class="main-container">
+        <div class="left-panel">
+            <div class="header">
+                <h1>💳 Payment Gateway Test Frontend</h1>
+                <p>Test the complete payment flow with Razorpay integration</p>
             </div>
 
-            <h4>💡 Payment Instructions</h4>
-            <ul>
-                <li><strong>Card Payments:</strong> Use any of the test cards above with random CVV and future expiry date</li>
-                <li><strong>UPI Payments:</strong> Use <code>success@razorpay</code> for successful payment flow</li>
-                <li><strong>Name:</strong> Any name can be used</li>
-                <li><strong>Amount:</strong> Any amount will work for testing</li>
-            </ul>
+            <div class="section">
+                <h3>🔐 Step 1: Authentication</h3>
+                <div class="input-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" value="sree555@gmail.com" placeholder="Enter your email">
+                </div>
+                <div class="input-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" value="password123" placeholder="Enter your password">
+                </div>
+                <button class="button" onclick="login()">🔑 Login & Get Token</button>
+                <div id="loginResult"></div>
+            </div>
+
+            <div class="section">
+                <h3>💰 Step 2: Create Payment</h3>
+                <div class="input-group">
+                    <label for="amount">Amount (INR):</label>
+                    <input type="number" id="amount" value="1000" min="1" placeholder="Enter amount">
+                </div>
+                <div class="input-group">
+                    <label for="description">Description:</label>
+                    <input type="text" id="description" value="Payment for services" placeholder="Enter description">
+                </div>
+                <button class="button" onclick="createPayment()" id="createBtn" disabled>📝 Create Payment</button>
+                <div id="createResult"></div>
+            </div>
+
+            <div class="section">
+                <h3>💳 Step 3: Complete Payment</h3>
+                <button class="button" onclick="pay()" id="payBtn" disabled>💳 Pay Now</button>
+                <div id="payResult"></div>
+            </div>
+
+            <div class="section">
+                <h3>✅ Step 4: Verify Payment</h3>
+                <button class="button" onclick="verifyPayment()" id="verifyBtn" disabled>🔍 Verify Payment</button>
+                <div id="verifyResult"></div>
+            </div>
+
+            <div class="section">
+                <h3>📋 Step 5: Check All Payments</h3>
+                <button class="button" onclick="getPayments()">📊 Get My Payments</button>
+                <div id="paymentsResult"></div>
+            </div>
+
+            <div class="section success">
+                <h3>📋 Current Status</h3>
+                <div id="status">Ready to start payment flow...</div>
+            </div>
         </div>
 
-        <div class="section success">
-            <h3>📋 Current Status</h3>
-            <div id="status">Ready to start payment flow...</div>
+        <div class="right-panel">
+            <div class="test-details">
+                <h3>🧪 Test Payment Details</h3>
+                
+                <div class="card-section">
+                    <h4>💳 Test Cards for Indian Payments</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Card Network</th>
+                                <th>Card Number</th>
+                                <th>CVV</th>
+                                <th>Expiry Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Mastercard</td>
+                                <td><code>2305 3242 5784 8228</code></td>
+                                <td>Random CVV</td>
+                                <td>Any future date</td>
+                            </tr>
+                            <tr>
+                                <td>Visa</td>
+                                <td><code>4386 2894 0766 0153</code></td>
+                                <td>Random CVV</td>
+                                <td>Any future date</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card-section">
+                    <h4>🌍 Test Cards for International Payments</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Card Network</th>
+                                <th>Card Number</th>
+                                <th>CVV</th>
+                                <th>Expiry Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Mastercard</td>
+                                <td><code>5421 1393 0609 0628</code></td>
+                                <td>Random CVV</td>
+                                <td>Any future date</td>
+                            </tr>
+                            <tr>
+                                <td>Mastercard</td>
+                                <td><code>5105 1051 0510 5100</code></td>
+                                <td>Random CVV</td>
+                                <td>Any future date</td>
+                            </tr>
+                            <tr>
+                                <td>Visa</td>
+                                <td><code>4012 8888 8888 1881</code></td>
+                                <td>Random CVV</td>
+                                <td>Any future date</td>
+                            </tr>
+                            <tr>
+                                <td>Visa</td>
+                                <td><code>5104 0600 0000 0008</code></td>
+                                <td>Random CVV</td>
+                                <td>Any future date</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="upi-section">
+                    <h4>📱 Test UPI Details</h4>
+                    <p><strong>UPI ID for Success Flow:</strong> <code>success@razorpay</code></p>
+                    <p><strong>Instructions:</strong></p>
+                    <ol>
+                        <li>At the Checkout, select <strong>UPI</strong> as the payment method</li>
+                        <li>Enter the UPI ID: <code>success@razorpay</code></li>
+                        <li>Complete the payment flow</li>
+                    </ol>
+                </div>
+
+                <div class="card-section">
+                    <h4>💡 Payment Instructions</h4>
+                    <ul>
+                        <li><strong>Card Payments:</strong> Use any of the test cards above with random CVV and future expiry date</li>
+                        <li><strong>UPI Payments:</strong> Use <code>success@razorpay</code> for successful payment flow</li>
+                        <li><strong>Name:</strong> Any name can be used</li>
+                        <li><strong>Amount:</strong> Any amount will work for testing</li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 
