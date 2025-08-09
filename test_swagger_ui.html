@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swagger UI Authorization Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        .step {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        .token-box {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            word-break: break-all;
+            margin: 10px 0;
+        }
+        .button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px 5px;
+        }
+        .button:hover {
+            background: #0056b3;
+        }
+        .success {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+        }
+        .error {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .copy-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .copy-btn:hover {
+            background: #545b62;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Swagger UI Authorization Test</h1>
+            <p>Test the Bearer token authorization in Swagger UI</p>
+        </div>
+
+        <div class="step">
+            <h3>📋 Step 1: Get a Fresh Token</h3>
+            <p>Click the button below to get a fresh JWT token for testing:</p>
+            <button class="button" onclick="getToken()">🔄 Get Fresh Token</button>
+            <div id="tokenResult"></div>
+        </div>
+
+        <div class="step">
+            <h3>🔑 Step 2: Copy the Bearer Token</h3>
+            <p>Copy this complete Bearer token (including "Bearer " prefix):</p>
+            <div id="bearerToken" class="token-box" style="display: none;">
+                Bearer <span id="tokenValue"></span>
+                <button class="copy-btn" onclick="copyBearerToken()">📋 Copy</button>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>🌐 Step 3: Open Swagger UI</h3>
+            <p>Click the button below to open Swagger UI in a new tab:</p>
+            <a href="http://localhost:8000/docs" target="_blank" class="button">📖 Open Swagger UI</a>
+        </div>
+
+        <div class="step">
+            <h3>🔒 Step 4: Authorize in Swagger UI</h3>
+            <ol>
+                <li>In Swagger UI, click the <strong>"Authorize"</strong> button (🔒) at the top right</li>
+                <li>In the "Value" field, paste the Bearer token from Step 2</li>
+                <li>Click <strong>"Authorize"</strong></li>
+                <li>Click <strong>"Close"</strong></li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>🧪 Step 5: Test Protected Endpoint</h3>
+            <ol>
+                <li>Find <strong>GET /auth/profile</strong> in Swagger UI</li>
+                <li>Click <strong>"Try it out"</strong></li>
+                <li>Click <strong>"Execute"</strong></li>
+                <li>You should see a 200 response with user data</li>
+            </ol>
+        </div>
+
+        <div class="step warning">
+            <h3>⚠️ Troubleshooting</h3>
+            <ul>
+                <li><strong>403 Forbidden:</strong> Make sure you included "Bearer " before the token</li>
+                <li><strong>401 Unauthorized:</strong> Token might be expired, get a fresh one</li>
+                <li><strong>No Authorization header:</strong> Clear browser cache and try again</li>
+                <li><strong>Swagger not working:</strong> Check browser console for JavaScript errors</li>
+            </ul>
+        </div>
+
+        <div class="step success">
+            <h3>✅ Expected Result</h3>
+            <p>When successful, you should see a response like:</p>
+            <pre>{
+  "id": "507f1f77bcf86cd799439011",
+  "email": "swagger_test@example.com",
+  "full_name": "Swagger Test User",
+  "created_at": "2024-01-01T00:00:00Z",
+  "updated_at": "2024-01-01T00:00:00Z"
+}</pre>
+        </div>
+    </div>
+
+    <script>
+        async function getToken() {
+            const button = event.target;
+            button.disabled = true;
+            button.textContent = '⏳ Getting token...';
+            
+            try {
+                const response = await fetch('http://localhost:8000/auth/signin', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'swagger_test@example.com',
+                        password: 'testpass123'
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const token = data.access_token;
+                    
+                    document.getElementById('tokenValue').textContent = token;
+                    document.getElementById('bearerToken').style.display = 'block';
+                    document.getElementById('tokenResult').innerHTML = 
+                        '<div class="test-result success">✅ Token obtained successfully!</div>';
+                } else {
+                    const error = await response.text();
+                    document.getElementById('tokenResult').innerHTML = 
+                        `<div class="test-result error">❌ Failed to get token: ${error}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('tokenResult').innerHTML = 
+                    `<div class="test-result error">❌ Error: ${error.message}</div>`;
+            } finally {
+                button.disabled = false;
+                button.textContent = '🔄 Get Fresh Token';
+            }
+        }
+
+        function copyBearerToken() {
+            const tokenText = document.getElementById('bearerToken').textContent;
+            navigator.clipboard.writeText(tokenText).then(() => {
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = '✅ Copied!';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+
+        // Auto-get token on page load
+        window.onload = function() {
+            getToken();
+        };
+    </script>
+</body>
+</html>

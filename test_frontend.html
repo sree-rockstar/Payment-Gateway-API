@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Gateway Test Frontend</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        .section {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        .button {
+            background: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        .button:hover {
+            background: #0056b3;
+        }
+        .button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .success {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+        .error {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+        }
+        .input-group {
+            margin: 15px 0;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .result {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 10px 0;
+            white-space: pre-wrap;
+        }
+        .step {
+            margin: 20px 0;
+            padding: 15px;
+            border-left: 4px solid #007bff;
+            background: #f8f9fa;
+        }
+        .step h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💳 Payment Gateway Test Frontend</h1>
+            <p>Test the complete payment flow with Razorpay integration</p>
+        </div>
+
+        <div class="section">
+            <h3>🔐 Step 1: Authentication</h3>
+            <div class="input-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" value="sree555@gmail.com" placeholder="Enter your email">
+            </div>
+            <div class="input-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" value="password123" placeholder="Enter your password">
+            </div>
+            <button class="button" onclick="login()">🔑 Login & Get Token</button>
+            <div id="loginResult"></div>
+        </div>
+
+        <div class="section">
+            <h3>💰 Step 2: Create Payment</h3>
+            <div class="input-group">
+                <label for="amount">Amount (INR):</label>
+                <input type="number" id="amount" value="1000" min="1" placeholder="Enter amount">
+            </div>
+            <div class="input-group">
+                <label for="description">Description:</label>
+                <input type="text" id="description" value="Payment for services" placeholder="Enter description">
+            </div>
+            <button class="button" onclick="createPayment()" id="createBtn" disabled>📝 Create Payment</button>
+            <div id="createResult"></div>
+        </div>
+
+        <div class="section">
+            <h3>💳 Step 3: Complete Payment</h3>
+            <button class="button" onclick="pay()" id="payBtn" disabled>💳 Pay Now</button>
+            <div id="payResult"></div>
+        </div>
+
+        <div class="section">
+            <h3>✅ Step 4: Verify Payment</h3>
+            <button class="button" onclick="verifyPayment()" id="verifyBtn" disabled>🔍 Verify Payment</button>
+            <div id="verifyResult"></div>
+        </div>
+
+        <div class="section">
+            <h3>📋 Step 5: Check All Payments</h3>
+            <button class="button" onclick="getPayments()">📊 Get My Payments</button>
+            <div id="paymentsResult"></div>
+        </div>
+
+        <div class="section warning">
+            <h3>🧪 Test Payment Details</h3>
+            
+            <h4>💳 Test Cards for Indian Payments</h4>
+            <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
+                <thead>
+                    <tr style="background: #f8f9fa;">
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Card Network</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Card Number</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">CVV</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Expiry Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Mastercard</td>
+                        <td style="border: 1px solid #ddd; padding: 8px; font-family: monospace;">2305 3242 5784 8228</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Random CVV</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Any future date</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Visa</td>
+                        <td style="border: 1px solid #ddd; padding: 8px; font-family: monospace;">4386 2894 0766 0153</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Random CVV</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Any future date</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>🌍 Test Cards for International Payments</h4>
+            <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
+                <thead>
+                    <tr style="background: #f8f9fa;">
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Card Network</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Card Number</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">CVV</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Expiry Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Mastercard</td>
+                        <td style="border: 1px solid #ddd; padding: 8px; font-family: monospace;">5421 1393 0609 0628</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Random CVV</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Any future date</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Mastercard</td>
+                        <td style="border: 1px solid #ddd; padding: 8px; font-family: monospace;">5105 1051 0510 5100</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Random CVV</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Any future date</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Visa</td>
+                        <td style="border: 1px solid #ddd; padding: 8px; font-family: monospace;">4012 8888 8888 1881</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Random CVV</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Any future date</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Visa</td>
+                        <td style="border: 1px solid #ddd; padding: 8px; font-family: monospace;">5104 0600 0000 0008</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Random CVV</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Any future date</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>📱 Test UPI Details</h4>
+            <div style="background: #e7f3ff; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                <p><strong>UPI ID for Success Flow:</strong> <code>success@razorpay</code></p>
+                <p><strong>Instructions:</strong></p>
+                <ol>
+                    <li>At the Checkout, select <strong>UPI</strong> as the payment method</li>
+                    <li>Enter the UPI ID: <code>success@razorpay</code></li>
+                    <li>Complete the payment flow</li>
+                </ol>
+            </div>
+
+            <h4>💡 Payment Instructions</h4>
+            <ul>
+                <li><strong>Card Payments:</strong> Use any of the test cards above with random CVV and future expiry date</li>
+                <li><strong>UPI Payments:</strong> Use <code>success@razorpay</code> for successful payment flow</li>
+                <li><strong>Name:</strong> Any name can be used</li>
+                <li><strong>Amount:</strong> Any amount will work for testing</li>
+            </ul>
+        </div>
+
+        <div class="section success">
+            <h3>📋 Current Status</h3>
+            <div id="status">Ready to start payment flow...</div>
+        </div>
+    </div>
+
+    <script>
+        let authToken = '';
+        let currentOrder = null;
+        let paymentResponse = null;
+
+        function updateStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = message;
+            statusDiv.className = type;
+        }
+
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const resultDiv = document.getElementById('loginResult');
+
+            try {
+                const response = await fetch('/auth/signin', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    authToken = data.access_token;
+                    resultDiv.innerHTML = '<div class="success">✅ Login successful! Token obtained.</div>';
+                    document.getElementById('createBtn').disabled = false;
+                    updateStatus('✅ Logged in successfully. Ready to create payment.', 'success');
+                } else {
+                    const error = await response.text();
+                    resultDiv.innerHTML = `<div class="error">❌ Login failed: ${error}</div>`;
+                    updateStatus('❌ Login failed.', 'error');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                updateStatus('❌ Network error during login.', 'error');
+            }
+        }
+
+        async function createPayment() {
+            const amount = parseFloat(document.getElementById('amount').value);
+            const description = document.getElementById('description').value;
+            const resultDiv = document.getElementById('createResult');
+
+            try {
+                const response = await fetch('/payments/create-payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        amount: amount,
+                        currency: 'INR',
+                        description: description
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    currentOrder = data;
+                    resultDiv.innerHTML = `<div class="success">✅ Payment created successfully!</div><div class="result">${JSON.stringify(data, null, 2)}</div>`;
+                    document.getElementById('payBtn').disabled = false;
+                    updateStatus('✅ Payment created. Ready to complete payment.', 'success');
+                } else {
+                    const error = await response.text();
+                    resultDiv.innerHTML = `<div class="error">❌ Payment creation failed: ${error}</div>`;
+                    updateStatus('❌ Payment creation failed.', 'error');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                updateStatus('❌ Network error during payment creation.', 'error');
+            }
+        }
+
+        function pay() {
+            if (!currentOrder) {
+                alert('Please create a payment first!');
+                return;
+            }
+
+            const options = {
+                "key": "rzp_test_GhpimiYFaNSyT5", // Your Razorpay Key ID
+                "amount": currentOrder.amount * 100, // Convert to paise
+                "currency": currentOrder.currency,
+                "name": "Payment Gateway API",
+                "description": currentOrder.description || "Payment for services",
+                "order_id": currentOrder.razorpay_order_id,
+                "handler": function (response) {
+                    paymentResponse = response;
+                    document.getElementById('payResult').innerHTML = `
+                        <div class="success">✅ Payment completed successfully!</div>
+                        <div class="result">Payment ID: ${response.razorpay_payment_id}
+Order ID: ${response.razorpay_order_id}
+Signature: ${response.razorpay_signature}</div>
+                    `;
+                    document.getElementById('verifyBtn').disabled = false;
+                    updateStatus('✅ Payment completed. Ready to verify.', 'success');
+                },
+                "prefill": {
+                    "name": "Test User",
+                    "email": document.getElementById('email').value,
+                    "contact": "9999999999"
+                },
+                "theme": {
+                    "color": "#3399cc"
+                },
+                "modal": {
+                    "ondismiss": function() {
+                        updateStatus('❌ Payment was cancelled.', 'error');
+                    }
+                }
+            };
+
+            var rzp = new Razorpay(options);
+            rzp.open();
+        }
+
+        async function verifyPayment() {
+            if (!paymentResponse) {
+                alert('Please complete a payment first!');
+                return;
+            }
+
+            const resultDiv = document.getElementById('verifyResult');
+
+            try {
+                const response = await fetch('/payments/verify-payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                        razorpay_order_id: paymentResponse.razorpay_order_id,
+                        razorpay_signature: paymentResponse.razorpay_signature
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `<div class="success">✅ Payment verified successfully!</div><div class="result">${JSON.stringify(data, null, 2)}</div>`;
+                    updateStatus('✅ Payment verified successfully!', 'success');
+                } else {
+                    const error = await response.text();
+                    resultDiv.innerHTML = `<div class="error">❌ Payment verification failed: ${error}</div>`;
+                    updateStatus('❌ Payment verification failed.', 'error');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                updateStatus('❌ Network error during verification.', 'error');
+            }
+        }
+
+        async function getPayments() {
+            const resultDiv = document.getElementById('paymentsResult');
+
+            try {
+                const response = await fetch('/payments/my-payments', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `<div class="success">✅ Payments retrieved successfully!</div><div class="result">${JSON.stringify(data, null, 2)}</div>`;
+                    updateStatus('✅ Payments retrieved successfully!', 'success');
+                } else {
+                    const error = await response.text();
+                    resultDiv.innerHTML = `<div class="error">❌ Failed to get payments: ${error}</div>`;
+                    updateStatus('❌ Failed to get payments.', 'error');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                updateStatus('❌ Network error while getting payments.', 'error');
+            }
+        }
+
+        // Auto-login on page load
+        window.onload = function() {
+            updateStatus('🚀 Ready to start payment flow. Click "Login & Get Token" to begin.', 'info');
+        };
+    </script>
+</body>
+</html>
